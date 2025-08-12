@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FFX2 Oversouled Enemy Tracker</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="app-header">
+        <h1>Final Fantasy X-2 Oversouled Enemy Tracker</h1>
+        <div class="progress-info">
+            <span id="progress-text">Progress: 0/131 (0%)</span>
+            <div class="progress-bar-container">
+                <div class="progress-bar" id="progress-bar">
+                    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="view-toggle">
+        <button id="numbered-view-btn" class="view-btn active">Numbered View</button>
+        <button id="floor-view-btn" class="view-btn">Floor View</button>
+    </nav>
+
+    <main class="content">
+        <!-- Numbered View -->
+        <section id="numbered-view" class="view-section active">
+            <div class="numbered-view-header">
+                <h2>All Enemies (1-131)</h2>
+                <div class="layout-toggle">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="two-column-toggle" class="toggle-checkbox">
+                        <span class="toggle-slider"></span>
+                        <span class="toggle-text">2 per row</span>
+                    </label>
+                </div>
+            </div>
+            <div class="enemy-list" id="numbered-enemy-list">
+            </div>
+        </section>
+
+        <!-- Floor View -->
+        <section id="floor-view" class="view-section">
+            <h2>Via Infinito Floors</h2>
+            <div class="floor-list" id="floor-enemy-list">
+            </div>
+        </section>
+    </main>
+
+    <footer class="app-footer">
+        <div class="credits">
+            <p>Enemy data based on the following guide:</p>
+            <a href="https://steamcommunity.com/sharedfiles/filedetails/?id=1934009379" target="_blank" rel="noopener noreferrer">
+                "The Bestiary: The End Garment Grid" by Bekk
+            </a>
+        </div>
+    </footer>
+
+    <script src="enemies-data.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
