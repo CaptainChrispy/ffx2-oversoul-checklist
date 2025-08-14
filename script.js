@@ -24,6 +24,14 @@ class FFX2Tracker {
         document.getElementById('two-column-toggle').addEventListener('change', (e) => {
             this.toggleTwoColumnLayout(e.target.checked);
         });
+
+        document.getElementById('check-all-btn').addEventListener('click', () => {
+            this.checkAll();
+        });
+
+        document.getElementById('uncheck-all-btn').addEventListener('click', () => {
+            this.uncheckAll();
+        });
     }
 
     switchView(view) {
@@ -183,6 +191,51 @@ class FFX2Tracker {
             const item = checkbox.closest('.enemy-item, .floor-enemy-item');
             if (item) {
                 if (isCompleted) {
+                    item.classList.add('completed');
+                } else {
+                    item.classList.remove('completed');
+                }
+            }
+        });
+    }
+
+    checkAll() {
+        enemiesData.forEach(enemy => {
+            this.completedEnemies.add(enemy.id);
+        });
+        
+        this.saveProgress();
+        this.updateProgress();
+        this.syncAllCheckboxes();
+        this.updateAllEnemyAppearances();
+    }
+
+    uncheckAll() {
+        if (confirm('Are you sure you want to uncheck all enemies?')) {
+            this.completedEnemies.clear();
+            
+            this.saveProgress();
+            this.updateProgress();
+            this.syncAllCheckboxes();
+            this.updateAllEnemyAppearances();
+        }
+    }
+
+    syncAllCheckboxes() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][id^="enemy-"]');
+        checkboxes.forEach(checkbox => {
+            const enemyId = parseInt(checkbox.id.match(/enemy-(\d+)-/)[1]);
+            checkbox.checked = this.completedEnemies.has(enemyId);
+        });
+    }
+
+    updateAllEnemyAppearances() {
+        const items = document.querySelectorAll('.enemy-item, .floor-enemy-item');
+        items.forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            if (checkbox) {
+                const enemyId = parseInt(checkbox.id.match(/enemy-(\d+)-/)[1]);
+                if (this.completedEnemies.has(enemyId)) {
                     item.classList.add('completed');
                 } else {
                     item.classList.remove('completed');
