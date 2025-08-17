@@ -21,6 +21,10 @@ class FFX2Tracker {
             this.switchView('floor');
         });
 
+        document.getElementById('chapter-view-btn').addEventListener('click', () => {
+            this.switchView('chapter');
+        });
+
         document.getElementById('two-column-toggle').addEventListener('change', (e) => {
             this.toggleTwoColumnLayout(e.target.checked);
         });
@@ -64,8 +68,10 @@ class FFX2Tracker {
     renderCurrentView() {
         if (this.currentView === 'numbered') {
             this.renderNumberedView();
-        } else {
+        } else if (this.currentView === 'floor') {
             this.renderFloorView();
+        } else if (this.currentView === 'chapter') {
+            this.renderChapterView();
         }
     }
 
@@ -92,6 +98,19 @@ class FFX2Tracker {
         });
     }
 
+    renderChapterView() {
+        const container = document.getElementById('chapter-enemy-list');
+        container.innerHTML = '';
+
+        const { chapterMap, sortedChapters } = organizeEnemiesByChapter();
+
+        sortedChapters.forEach(chapter => {
+            const enemies = chapterMap.get(chapter);
+            const chapterSection = this.createChapterSection(chapter, enemies);
+            container.appendChild(chapterSection);
+        });
+    }
+
     createFloorSection(floor, enemies) {
         const section = document.createElement('div');
         section.className = 'floor-section';
@@ -113,9 +132,36 @@ class FFX2Tracker {
         return section;
     }
 
+    createChapterSection(chapter, enemies) {
+        const section = document.createElement('div');
+        section.className = 'chapter-section';
+
+        const header = document.createElement('h3');
+        header.className = 'chapter-header';
+        header.textContent = chapter;
+
+        const enemiesContainer = document.createElement('div');
+        enemiesContainer.className = 'chapter-enemies';
+
+        enemies.forEach(enemy => {
+            const enemyElement = this.createEnemyElement(enemy, 'chapter');
+            enemiesContainer.appendChild(enemyElement);
+        });
+
+        section.appendChild(header);
+        section.appendChild(enemiesContainer);
+        return section;
+    }
+
     createEnemyElement(enemy, viewType) {
         const item = document.createElement('div');
-        item.className = viewType === 'numbered' ? 'enemy-item' : 'floor-enemy-item';
+        if (viewType === 'numbered') {
+            item.className = 'enemy-item';
+        } else if (viewType === 'floor') {
+            item.className = 'floor-enemy-item';
+        } else if (viewType === 'chapter') {
+            item.className = 'chapter-enemy-item';
+        }
         
         if (this.completedEnemies.has(enemy.id)) {
             item.classList.add('completed');
@@ -230,7 +276,7 @@ class FFX2Tracker {
     }
 
     updateAllEnemyAppearances() {
-        const items = document.querySelectorAll('.enemy-item, .floor-enemy-item');
+        const items = document.querySelectorAll('.enemy-item, .floor-enemy-item, .chapter-enemy-item');
         items.forEach(item => {
             const checkbox = item.querySelector('input[type="checkbox"]');
             if (checkbox) {

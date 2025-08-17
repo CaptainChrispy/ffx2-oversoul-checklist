@@ -181,3 +181,36 @@ function organizeEnemiesByFloor() {
     
     return { floorMap, sortedFloors };
 }
+
+function organizeEnemiesByChapter() {
+    const chapterMap = new Map();
+    
+    enemiesData.forEach(enemy => {
+        let chapter = "Other";
+        
+        const location = enemy.location;
+        if (location.includes("CH1")) {
+            chapter = "Chapter 1";
+        } else if (location.includes("CH2")) {
+            chapter = "Chapter 2";
+        } else if (location.includes("CH3")) {
+            chapter = "Chapter 3";
+        } else if (location.includes("CH4")) {
+            chapter = "Chapter 4";
+        } else if (location.includes("Farplane") || location.includes("Infinito") || 
+                  location.includes("Hollow") || location.includes("Chocobo") || 
+                  location.includes("Desert") || location.includes("Colony")) {
+            chapter = "Chapter 5";
+        }
+        
+        if (!chapterMap.has(chapter)) {
+            chapterMap.set(chapter, []);
+        }
+        chapterMap.get(chapter).push(enemy);
+    });
+    
+    const chapterOrder = ["Chapter 1", "Chapter 2", "Chapter 3", "Chapter 4", "Chapter 5", "Other"];
+    const sortedChapters = chapterOrder.filter(chapter => chapterMap.has(chapter));
+    
+    return { chapterMap, sortedChapters };
+}
