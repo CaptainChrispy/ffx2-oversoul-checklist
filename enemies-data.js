@@ -214,3 +214,71 @@ function organizeEnemiesByChapter() {
     
     return { chapterMap, sortedChapters };
 }
+
+function organizeEnemiesByArea() {
+    const areaMap = new Map();
+    
+    enemiesData.forEach(enemy => {
+        let area = "Other";
+        
+        const location = enemy.location;
+        
+        if (location.includes("Besaid")) {
+            area = "Besaid";
+        } else if (location.includes("Thunder P.")) {
+            area = "Thunder Plains";
+        } else if (location.includes("MT. Gagazet") || location.includes("Mt. Gagazet")) {
+            area = "Mt. Gagazet";
+        } else if (location.includes("Floating Ruins")) {
+            area = "Floating Ruins";
+        } else if (location.includes("Calm Lands")) {
+            area = "Calm Lands";
+        } else if (location.includes("Bikanel")) {
+            area = "Bikanel Desert";
+        } else if (location.includes("Mi'ihen")) {
+            area = "Mi'ihen Highroad";
+        } else if (location.includes("Zanarkand")) {
+            area = "Zanarkand";
+        } else if (location.includes("Djose Road")) {
+            area = "Djose Road";
+        } else if (location.includes("Macalania")) {
+            area = "Macalania";
+        } else if (location.includes("Moonflow")) {
+            area = "Moonflow";
+        } else if (location.includes("Bevelle")) {
+            area = "Bevelle";
+        } else if (location.includes("Mushroom RR")) {
+            area = "Mushroom Rock Road";
+        } else if (location.includes("CL Ruins")) {
+            area = "Calm Lands Ruins";
+        } else if (location.includes("Infinito")) {
+            area = "Via Infinito";
+        } else if (location.includes("Farplane")) {
+            area = "Farplane";
+        } else if (location.includes("Hollow")) {
+            area = "Hollow";
+        } else if (location.includes("Chocobo")) {
+            area = "Chocobo Ranch";
+        } else if (location.includes("Desert")) {
+            area = "Desert";
+        } else if (location.includes("Colony")) {
+            area = "Colony";
+        } else if (location.includes("Haunt")) {
+            area = "The Haunt";
+        } else if (location.includes("CoSF")) {
+            area = "Calm Lands - Cavern of Stolen Fayth";
+        }
+        
+        if (!areaMap.has(area)) {
+            areaMap.set(area, []);
+        }
+        areaMap.get(area).push(enemy);
+    });
+    
+    // Sort areas alphabetically, but put special areas at the end
+    const specialAreas = ["Via Infinito", "Farplane", "Hollow", "Chocobo Ranch", "Desert", "Colony", "The Haunt", "Other"];
+    const regularAreas = Array.from(areaMap.keys()).filter(area => !specialAreas.includes(area)).sort();
+    const sortedAreas = [...regularAreas, ...specialAreas.filter(area => areaMap.has(area))];
+    
+    return { areaMap, sortedAreas };
+}
