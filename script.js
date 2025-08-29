@@ -13,20 +13,11 @@ class FFX2Tracker {
     }
 
     setupEventListeners() {
-        document.getElementById('numbered-view-btn').addEventListener('click', () => {
-            this.switchView('numbered');
-        });
-
-        document.getElementById('floor-view-btn').addEventListener('click', () => {
-            this.switchView('floor');
-        });
-
-        document.getElementById('chapter-view-btn').addEventListener('click', () => {
-            this.switchView('chapter');
-        });
-
-        document.getElementById('area-view-btn').addEventListener('click', () => {
-            this.switchView('area');
+        const viewButtons = ['numbered', 'floor', 'chapter', 'area'];
+        viewButtons.forEach(view => {
+            document.getElementById(`${view}-view-btn`).addEventListener('click', () => {
+                this.switchView(view);
+            });
         });
 
         document.getElementById('two-column-toggle').addEventListener('change', (e) => {
@@ -60,25 +51,19 @@ class FFX2Tracker {
 
     toggleTwoColumnLayout(enabled) {
         const enemyList = document.getElementById('numbered-enemy-list');
-        if (enabled) {
-            enemyList.classList.add('two-column');
-        } else {
-            enemyList.classList.remove('two-column');
-        }
-        
+        enemyList.classList.toggle('two-column', enabled);
         localStorage.setItem('ffx2-two-column-layout', JSON.stringify(enabled));
     }
 
     renderCurrentView() {
-        if (this.currentView === 'numbered') {
-            this.renderNumberedView();
-        } else if (this.currentView === 'floor') {
-            this.renderFloorView();
-        } else if (this.currentView === 'chapter') {
-            this.renderChapterView();
-        } else if (this.currentView === 'area') {
-            this.renderAreaView();
-        }
+        const renderMethods = {
+            numbered: () => this.renderNumberedView(),
+            floor: () => this.renderFloorView(),
+            chapter: () => this.renderChapterView(),
+            area: () => this.renderAreaView()
+        };
+        
+        renderMethods[this.currentView]?.();
     }
 
     renderNumberedView() {
@@ -131,60 +116,30 @@ class FFX2Tracker {
     }
 
     createFloorSection(floor, enemies) {
-        const section = document.createElement('div');
-        section.className = 'floor-section';
-
-        const header = document.createElement('h3');
-        header.className = 'floor-header';
-        header.textContent = floor === "Other" ? "Special Encounters" : `Floor ${floor}`;
-
-        const enemiesContainer = document.createElement('div');
-        enemiesContainer.className = 'floor-enemies';
-
-        enemies.forEach(enemy => {
-            const enemyElement = this.createEnemyElement(enemy, 'floor');
-            enemiesContainer.appendChild(enemyElement);
-        });
-
-        section.appendChild(header);
-        section.appendChild(enemiesContainer);
-        return section;
+        return this.createGenericSection('floor', floor === "Other" ? "Special Encounters" : `Floor ${floor}`, enemies);
     }
 
     createChapterSection(chapter, enemies) {
-        const section = document.createElement('div');
-        section.className = 'chapter-section';
-
-        const header = document.createElement('h3');
-        header.className = 'chapter-header';
-        header.textContent = chapter;
-
-        const enemiesContainer = document.createElement('div');
-        enemiesContainer.className = 'chapter-enemies';
-
-        enemies.forEach(enemy => {
-            const enemyElement = this.createEnemyElement(enemy, 'chapter');
-            enemiesContainer.appendChild(enemyElement);
-        });
-
-        section.appendChild(header);
-        section.appendChild(enemiesContainer);
-        return section;
+        return this.createGenericSection('chapter', chapter, enemies);
     }
 
     createAreaSection(area, enemies) {
+        return this.createGenericSection('area', area, enemies);
+    }
+
+    createGenericSection(type, title, enemies) {
         const section = document.createElement('div');
-        section.className = 'area-section';
+        section.className = `${type}-section`;
 
         const header = document.createElement('h3');
-        header.className = 'area-header';
-        header.textContent = area;
+        header.className = `${type}-header`;
+        header.textContent = title;
 
         const enemiesContainer = document.createElement('div');
-        enemiesContainer.className = 'area-enemies';
+        enemiesContainer.className = `${type}-enemies`;
 
         enemies.forEach(enemy => {
-            const enemyElement = this.createEnemyElement(enemy, 'area');
+            const enemyElement = this.createEnemyElement(enemy, type);
             enemiesContainer.appendChild(enemyElement);
         });
 
@@ -195,15 +150,14 @@ class FFX2Tracker {
 
     createEnemyElement(enemy, viewType) {
         const item = document.createElement('div');
-        if (viewType === 'numbered') {
-            item.className = 'enemy-item';
-        } else if (viewType === 'floor') {
-            item.className = 'floor-enemy-item';
-        } else if (viewType === 'chapter') {
-            item.className = 'chapter-enemy-item';
-        } else if (viewType === 'area') {
-            item.className = 'area-enemy-item';
-        }
+        const classNames = {
+            numbered: 'enemy-item',
+            floor: 'floor-enemy-item',
+            chapter: 'chapter-enemy-item',
+            area: 'area-enemy-item'
+        };
+        
+        item.className = classNames[viewType] || 'enemy-item';
         
         if (this.completedEnemies.has(enemy.id)) {
             item.classList.add('completed');
@@ -278,11 +232,7 @@ class FFX2Tracker {
         items.forEach(checkbox => {
             const item = checkbox.closest('.enemy-item, .floor-enemy-item, .chapter-enemy-item, .area-enemy-item');
             if (item) {
-                if (isCompleted) {
-                    item.classList.add('completed');
-                } else {
-                    item.classList.remove('completed');
-                }
+                item.classList.toggle('completed', isCompleted);
             }
         });
     }
@@ -323,11 +273,7 @@ class FFX2Tracker {
             const checkbox = item.querySelector('input[type="checkbox"]');
             if (checkbox) {
                 const enemyId = parseInt(checkbox.id.match(/enemy-(\d+)-/)[1]);
-                if (this.completedEnemies.has(enemyId)) {
-                    item.classList.add('completed');
-                } else {
-                    item.classList.remove('completed');
-                }
+                item.classList.toggle('completed', this.completedEnemies.has(enemyId));
             }
         });
     }
